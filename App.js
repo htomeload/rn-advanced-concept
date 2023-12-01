@@ -1,59 +1,75 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text } from "react-native";
+import { Dimensions, ScrollView, StyleSheet } from "react-native";
 import SafeAreaView from "./src/components/safe-area-view/SafeAreaView";
 import Deck from "./src/Deck";
+import { Button, Card, Image, Text } from "react-native-elements";
 
 const DATA = [
   {
     id: 1,
     text: "Card #1",
-    uri: "http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-04.jpg",
+    uri: "https://picsum.photos/id/1/200",
   },
   {
     id: 2,
     text: "Card #2",
-    uri: "http://www.fluxdigital.co/wp-content/uploads/2015/04/Unsplash.jpg",
+    uri: "https://picsum.photos/id/2/200",
   },
   {
     id: 3,
     text: "Card #3",
-    uri: "http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-09.jpg",
+    uri: "https://picsum.photos/id/3/200",
   },
   {
     id: 4,
     text: "Card #4",
-    uri: "http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-01.jpg",
+    uri: "https://picsum.photos/id/4/200",
   },
   {
     id: 5,
     text: "Card #5",
-    uri: "http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-04.jpg",
+    uri: "https://picsum.photos/id/5/200",
   },
   {
     id: 6,
     text: "Card #6",
-    uri: "http://www.fluxdigital.co/wp-content/uploads/2015/04/Unsplash.jpg",
+    uri: "https://picsum.photos/id/6/200",
   },
   {
     id: 7,
     text: "Card #7",
-    uri: "http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-09.jpg",
+    uri: "https://picsum.photos/id/7/200",
   },
   {
     id: 8,
     text: "Card #8",
-    uri: "http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-01.jpg",
+    uri: "https://picsum.photos/id/8/200",
   },
 ];
 
 export default function App() {
   const renderCard = (item) => {
-    return <Text>{item?.text}</Text>;
+    return (
+      <Card key={`card-id-${item?.id}`}>
+        <Image
+          source={{ uri: item?.uri }}
+          resizeMode="cover"
+          style={styles.cardImage}
+        />
+        <Text style={styles.cardTitle}>{item?.text}</Text>
+        <Button
+          onPress={() => null}
+          icon={{ name: "code" }}
+          title={"View now"}
+        />
+      </Card>
+    );
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Deck renderCard={renderCard} data={DATA} />
+      <ScrollView>
+        <Deck renderCard={renderCard} data={DATA} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -62,5 +78,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingHorizontal: 12,
+  },
+  cardImage: {
+    height: 200,
+  },
+  cardTitle: {
+    marginVertical: 12,
   },
 });
