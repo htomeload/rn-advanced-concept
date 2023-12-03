@@ -1,4 +1,4 @@
-import { Dimensions, ScrollView, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import SafeAreaView from "./src/components/safe-area-view/SafeAreaView";
 import Deck from "./src/Deck";
 import { Button, Card, Image, Text } from "react-native-elements";
@@ -67,9 +67,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <Deck renderCard={renderCard} data={DATA} />
-      </ScrollView>
+      <Deck renderCard={renderCard} data={DATA} />
     </SafeAreaView>
   );
 }
