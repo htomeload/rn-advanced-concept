@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   cardImage: {
-    height: 200,
+    height: 150,
   },
   cardTitle: {
     marginVertical: 12,

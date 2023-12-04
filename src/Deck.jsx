@@ -19,6 +19,18 @@ export default function Deck({ renderCard, data }) {
     setAxisY(gesture?.dy);
   };
 
+  const getCardStyle = () => {
+    const rotate = position.x.interpolate({
+      inputRange: [-500, 0, 500],
+      outputRange: ["-120deg", "0deg", "120deg"],
+    });
+
+    return {
+      ...position.getLayout(),
+      transform: [{ rotate }],
+    };
+  };
+
   useEffect(() => {
     setPanResponder(
       PanResponder.create({
@@ -38,17 +50,26 @@ export default function Deck({ renderCard, data }) {
   if (!panResponder) return null;
 
   return (
-    <Animated.View style={position.getLayout()} {...panResponder?.panHandlers}>
-      <FlatList
-        data={data}
-        renderItem={(flatItem) => {
-          const { item, index } = flatItem;
+    <FlatList
+      data={data}
+      renderItem={(flatItem) => {
+        const { item, index } = flatItem;
 
-          return renderCard?.(item);
-        }}
-        keyExtractor={(item, index) => `card-id-${item?.id}`}
-      />
-    </Animated.View>
+        if (index === 0) {
+          return (
+            <Animated.View
+              style={getCardStyle()}
+              {...panResponder?.panHandlers}
+            >
+              {renderCard?.(item)}
+            </Animated.View>
+          );
+        }
+
+        return renderCard?.(item);
+      }}
+      keyExtractor={(item, index) => `card-id-${item?.id}`}
+    />
   );
 }
 
