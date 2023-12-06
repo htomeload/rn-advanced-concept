@@ -9,8 +9,10 @@ import {
 } from "react-native";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
+const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
+const SWIPE_OUT_DURATION = 250;
 
-export default function Deck({ renderCard, data }) {
+export default function Deck({ renderCard, data, onSwipeLeft, onSwipeRight }) {
   const [panResponder, setPanResponder] = useState(null);
   const [position, setPosition] = useState(new Animated.ValueXY());
 
@@ -24,6 +26,19 @@ export default function Deck({ renderCard, data }) {
       ...position.getLayout(),
       transform: [{ rotate }],
     };
+  };
+
+  const onCardLeftScreen = (side) => {
+    // side === 'left' ? onSwipeLeft?.() : onSwipeRight?.();
+  };
+
+  const swipeToExit = (side) => {
+    const x = side === "left" ? -SCREEN_WIDTH : SCREEN_WIDTH;
+    Animated.timing(position, {
+      toValue: { x, y: 0 },
+      duration: SWIPE_OUT_DURATION,
+      useNativeDriver: false,
+    }).start(() => onCardLeftScreen(side));
   };
 
   const backToDefaultPosition = () => {
@@ -40,8 +55,16 @@ export default function Deck({ renderCard, data }) {
         onPanResponderMove: (event, gesture) => {
           position.setValue({ x: gesture.dx, y: gesture.dy });
         },
-        onPanResponderRelease: () => {
-          backToDefaultPosition();
+        onPanResponderRelease: (event, gesture) => {
+          if (gesture.dx > SWIPE_THRESHOLD) {
+            console.log("swipe like!");
+            swipeToExit("right");
+          } else if (gesture.dx < -SWIPE_THRESHOLD) {
+            console.log("swipe dislike!");
+            swipeToExit("left");
+          } else {
+            backToDefaultPosition();
+          }
         },
       })
     );
