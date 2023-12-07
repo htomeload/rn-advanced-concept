@@ -15,6 +15,7 @@ const SWIPE_OUT_DURATION = 250;
 export default function Deck({ renderCard, data, onSwipeLeft, onSwipeRight }) {
   const [panResponder, setPanResponder] = useState(null);
   const [position, setPosition] = useState(new Animated.ValueXY());
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const getCardStyle = () => {
     const rotate = position.x.interpolate({
@@ -29,7 +30,11 @@ export default function Deck({ renderCard, data, onSwipeLeft, onSwipeRight }) {
   };
 
   const onCardLeftScreen = (side) => {
-    // side === 'left' ? onSwipeLeft?.() : onSwipeRight?.();
+    side === "left"
+      ? onSwipeLeft?.(data?.[index])
+      : onSwipeRight?.(data?.[index]);
+    setCurrentIndex((value) => value + 1);
+    position.setValue({ x: 0, y: 0 });
   };
 
   const swipeToExit = (side) => {
@@ -79,10 +84,13 @@ export default function Deck({ renderCard, data, onSwipeLeft, onSwipeRight }) {
   return (
     <FlatList
       data={data}
+      extraData={[currentIndex]}
       renderItem={(flatItem) => {
         const { item, index } = flatItem;
 
-        if (index === 0) {
+        if (index < currentIndex) return null;
+
+        if (index === currentIndex) {
           return (
             <Animated.View
               style={getCardStyle()}
