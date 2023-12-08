@@ -6,13 +6,20 @@ import {
   PanResponder,
   FlatList,
   Dimensions,
+  StatusBar,
 } from "react-native";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
 const SWIPE_OUT_DURATION = 250;
 
-export default function Deck({ renderCard, data, onSwipeLeft, onSwipeRight }) {
+export default function Deck({
+  renderCard,
+  data,
+  onSwipeLeft,
+  onSwipeRight,
+  renderNoMoreCard,
+}) {
   const [panResponder, setPanResponder] = useState(null);
   const [position, setPosition] = useState(new Animated.ValueXY());
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -31,8 +38,8 @@ export default function Deck({ renderCard, data, onSwipeLeft, onSwipeRight }) {
 
   const onCardLeftScreen = (side) => {
     side === "left"
-      ? onSwipeLeft?.(data?.[index])
-      : onSwipeRight?.(data?.[index]);
+      ? onSwipeLeft?.(data?.[currentIndex])
+      : onSwipeRight?.(data?.[currentIndex]);
     setCurrentIndex((value) => value + 1);
     position.setValue({ x: 0, y: 0 });
   };
@@ -81,35 +88,39 @@ export default function Deck({ renderCard, data, onSwipeLeft, onSwipeRight }) {
 
   if (!panResponder) return null;
 
-  return (
-    <FlatList
-      data={data}
-      extraData={[currentIndex]}
-      renderItem={(flatItem) => {
-        const { item, index } = flatItem;
+  return data
+    ?.map((item, index) => {
+      if (currentIndex >= data?.length && index === data?.length - 1) {
+        return renderNoMoreCard?.();
+      }
 
-        if (index < currentIndex) return null;
+      if (index < currentIndex) return null;
 
-        if (index === currentIndex) {
-          return (
-            <Animated.View
-              style={getCardStyle()}
-              {...panResponder?.panHandlers}
-            >
-              {renderCard?.(item)}
-            </Animated.View>
-          );
-        }
+      if (index === currentIndex) {
+        return (
+          <Animated.View
+            key={`animated-card-warpper-id-${item?.id}`}
+            style={[getCardStyle(), styles.mainContainer]}
+            {...panResponder?.panHandlers}
+          >
+            {renderCard?.(item)}
+          </Animated.View>
+        );
+      }
 
-        return renderCard?.(item);
-      }}
-      keyExtractor={(item, index) => `card-id-${item?.id}`}
-    />
-  );
+      return (
+        <View key={`card-warpper-id-${item?.id}`} style={styles.mainContainer}>
+          {renderCard?.(item)}
+        </View>
+      );
+    })
+    .reverse();
 }
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 1,
+    position: "absolute",
+    width: SCREEN_WIDTH,
+    paddingTop: StatusBar.currentHeight,
   },
 });
