@@ -1,12 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
-  View,
   Animated,
   StyleSheet,
   PanResponder,
-  FlatList,
   Dimensions,
   StatusBar,
+  LayoutAnimation,
+  UIManager,
+  Platform,
 } from "react-native";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -23,6 +24,8 @@ export default function Deck({
   const [panResponder, setPanResponder] = useState(null);
   const [position, setPosition] = useState(new Animated.ValueXY());
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const componentWillUpdate = useRef(true);
 
   const getCardStyle = () => {
     const rotate = position.x.interpolate({
@@ -69,10 +72,8 @@ export default function Deck({
         },
         onPanResponderRelease: (event, gesture) => {
           if (gesture.dx > SWIPE_THRESHOLD) {
-            console.log("swipe like!");
             swipeToExit("right");
           } else if (gesture.dx < -SWIPE_THRESHOLD) {
-            console.log("swipe dislike!");
             swipeToExit("left");
           } else {
             backToDefaultPosition();
@@ -80,11 +81,22 @@ export default function Deck({
         },
       })
     );
+
+    if (
+      Platform.OS === "android" &&
+      UIManager.setLayoutAnimationEnabledExperimental
+    ) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
   }, []);
 
   useEffect(() => {
     setPosition(position);
   }, [position]);
+
+  useLayoutEffect(() => {
+    LayoutAnimation.spring();
+  }, [currentIndex]);
 
   if (!panResponder) return null;
 
@@ -109,9 +121,12 @@ export default function Deck({
       }
 
       return (
-        <View key={`card-warpper-id-${item?.id}`} style={styles.mainContainer}>
+        <Animated.View
+          key={`card-warpper-id-${item?.id}`}
+          style={[styles.mainContainer, { top: 10 * (index - currentIndex) }]}
+        >
           {renderCard?.(item)}
-        </View>
+        </Animated.View>
       );
     })
     .reverse();
