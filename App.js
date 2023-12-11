@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import SafeAreaView from "./src/components/safe-area-view/SafeAreaView";
 import Deck from "./src/Deck";
 import { Button, Card, Image, Text } from "react-native-elements";
@@ -65,16 +65,12 @@ export default function App() {
     );
   };
 
-  const renderNoMoreCard = () => {
+  const renderNoMoreCard = (callback) => {
     return (
       <Card key={`card-id-0`}>
         <Text style={styles.cardTitle}>All done!</Text>
         <Text style={styles.cardTextContent}>There's no more content!</Text>
-        <Button
-          onPress={() => null}
-          icon={{ name: "code" }}
-          title={"Get more"}
-        />
+        <Button onPress={callback} icon={{ name: "code" }} title={"Get more"} />
       </Card>
     );
   };

@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   Animated,
   StyleSheet,
@@ -24,8 +24,7 @@ export default function Deck({
   const [panResponder, setPanResponder] = useState(null);
   const [position, setPosition] = useState(new Animated.ValueXY());
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const componentWillUpdate = useRef(true);
+  const [cardList, setCardList] = useState(data);
 
   const getCardStyle = () => {
     const rotate = position.x.interpolate({
@@ -63,6 +62,10 @@ export default function Deck({
     }).start();
   };
 
+  const resetCurrentIndex = () => {
+    setCurrentIndex(0);
+  };
+
   useEffect(() => {
     setPanResponder(
       PanResponder.create({
@@ -82,28 +85,35 @@ export default function Deck({
       })
     );
 
-    if (
-      Platform.OS === "android" &&
-      UIManager.setLayoutAnimationEnabledExperimental
-    ) {
-      UIManager.setLayoutAnimationEnabledExperimental(true);
-    }
+    // if (
+    //   Platform.OS === "android" &&
+    //   UIManager.setLayoutAnimationEnabledExperimental
+    // ) {
+    //   UIManager.setLayoutAnimationEnabledExperimental(true);
+    // }
   }, []);
 
   useEffect(() => {
     setPosition(position);
   }, [position]);
 
-  useLayoutEffect(() => {
-    LayoutAnimation.spring();
-  }, [currentIndex]);
+  useEffect(() => {
+    if (data !== cardList) {
+      setCurrentIndex(0);
+      setCardList(data);
+    }
+  }, [data]);
+
+  // useLayoutEffect(() => {
+  //   LayoutAnimation.spring();
+  // }, [currentIndex]);
 
   if (!panResponder) return null;
 
-  return data
+  return cardList
     ?.map((item, index) => {
-      if (currentIndex >= data?.length && index === data?.length - 1) {
-        return renderNoMoreCard?.();
+      if (currentIndex >= cardList?.length && index === cardList?.length - 1) {
+        return renderNoMoreCard?.(resetCurrentIndex);
       }
 
       if (index < currentIndex) return null;
